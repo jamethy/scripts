@@ -1,0 +1,42 @@
+#!/bin/bash
+
+## Edit-Move
+##
+## Version 0.1
+## Uses EDITOR to edit a file name or group of file names
+
+# verify input
+count=$#
+if [ $count -eq 0 ]; then
+    echo "Usage: $(basename $0) SOURCE..."
+    exit;
+fi
+
+# create temporary file containing file names
+emvfile=$(mktemp emv.XXXXXXXXXX)
+for arg; do
+    echo "$arg" >> $emvfile
+done
+
+# edit file
+$EDITOR $emvfile
+
+# verify output
+newcount=$(cat $emvfile | sed '/^\s*$/d' | sort -u | wc -l)
+if [ $count -ne $newcount ]; then
+    echo "Must have the same number of unique file names"
+    rm "$emvfile"
+    exit;
+fi
+
+echo $newfiles
+
+# move files
+IFS=$'\r\n' GLOBIGNORE='*' command eval  "newfiles=($(cat $emvfile | sed '/^\s*$/d'))"
+for i in `seq 1 $count`;
+do
+    mv ${!i} ${newfiles[$i - 1]}
+done
+
+# cleanup
+rm "$emvfile"
