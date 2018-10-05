@@ -7,5 +7,5 @@ Caveat: You cannot swap file names.
 
 ## genpasswd
 Generates a random password using letters, numbers, and special characters. Options include:
-* -l _length_: Sets the length of the resulting password
-* -h: Print the md5 hash of the password on the next line
+* `-l` _length_: Sets the length of the resulting password
+* `-h`: Print the md5 hash of the password on the next line
