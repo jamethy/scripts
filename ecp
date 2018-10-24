@@ -1,0 +1,42 @@
+#!/bin/bash
+
+## Edit-Copy
+##
+## Version 0.1
+## Uses EDITOR to copy a file name or group of files to new names
+
+# verify input
+count=$#
+if [ $count -eq 0 ]; then
+    echo "Usage: $(basename $0) SOURCE..."
+    exit;
+fi
+
+# create temporary file containing file names
+ecpfile=$(mktemp ecp.XXXXXXXXXX)
+for arg; do
+    echo "$arg" >> $ecpfile
+done
+
+# edit file
+$EDITOR $ecpfile
+
+# verify output
+newcount=$(cat $ecpfile | sed '/^\s*$/d' | sort -u | wc -l)
+if [ $count -ne $newcount ]; then
+    echo "Must have the same number of unique file names"
+    rm "$ecpfile"
+    exit;
+fi
+
+echo $newfiles
+
+# move files
+IFS=$'\r\n' GLOBIGNORE='*' command eval  "newfiles=($(cat $ecpfile | sed '/^\s*$/d'))"
+for i in `seq 1 $count`;
+do
+    cp ${!i} ${newfiles[$i - 1]}
+done
+
+# cleanup
+rm "$ecpfile"
