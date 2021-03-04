@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# prepare-commit-msg script 
+# checks for a JIRA ticket in the branch and prepends the commit message with it
+
+import sys, re
+from subprocess import check_output
+
+# prepare-commit-msg args
+commit_msg_filepath = sys.argv[1]
+#commit_type = sys.argv[2]
+#commit_hash = sys.argv[3]
+
+# get current branch name
+try:
+    branch = check_output( 'git symbolic-ref --short HEAD'.split()).strip().decode('utf-8')
+
+    # check if it starts with a ticket
+    ticket_regex = r'([A-Za-z]+)?/([A-Za-z]{2,4}-\d+).*'
+    branch_match = re.match(ticket_regex, branch)
+    if branch_match:
+        ticket = branch_match.group(2)
+        # add ticket to start of message
+        with open(commit_msg_filepath, 'r+') as f:
+            content = f.read()
+
+            # check if message already starts with a ticket
+            if not re.match(ticket_regex, content):
+                f.seek(0, 0)
+                f.write("%s: %s" % (ticket.upper(), content))
+except:
+    print('error while preparing commit message')

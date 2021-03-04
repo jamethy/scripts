@@ -1,13 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from random import sample
 import hashlib
 import sys
 
 # Constants
-LETTERS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-NUMBERS = set('1234567890')
-SPECIALS = set('!@#$%^&*')
+LETTERS = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+NUMBERS = list('1234567890')
+SPECIALS = list('!@#$%^&*')
 
 ## Sample characters from list
 def sampleCharacters(chars, count):
@@ -24,16 +24,23 @@ length = 16;
 argv = sys.argv;
 argc = len(argv)
 
+noSpecials = False
+
 for i in range(1, argc):
     arg = argv[i]
     if arg == '-h':
         doHash = True
-    elif arg == '-l' and i + 1 < argc and argv[i + 1].isdigit() :
+    elif arg == '-l' and i + 1 < argc and argv[i + 1].isdigit():
         length = int(argv[i + 1])
+    elif arg == '-s':
+        noSpecials = True
 
 numLetters = int(0.6 * length)
 numNumbers = int(0.2 * length)
 numSpecials = length - numLetters - numNumbers
+if noSpecials:
+    numLetters += numSpecials
+    numSpecials = 0
 
 passwd = ''
 passwd += sampleCharacters(LETTERS, numLetters)
@@ -42,7 +49,7 @@ passwd += sampleCharacters(SPECIALS, numSpecials)
 
 # scramble
 passwd = ''.join(sample(passwd, len(passwd)))
-print passwd
+print(passwd)
 
 if doHash:
-    print hashlib.md5(passwd).hexdigest()
+    print(hashlib.md5(passwd).hexdigest())
